@@ -1,0 +1,16 @@
+{
+  "name": "guildeventsbot",
+  "version": "1.0.0",
+  "description": "Chat bot for querying info about guild events.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"no tests\""
+  },
+  "author": "hanzki",
+  "license": "ISC",
+  "dependencies": {
+    "ical": "^0.5.0",
+    "jsonfile": "^3.0.1",
+    "moment": "^2.18.1"
+  }
+}
