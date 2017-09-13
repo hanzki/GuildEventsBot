@@ -6,6 +6,9 @@ const EVENTS_URL = 'http://tietokilta.fi/kalenteri/ical';
 
 const functions = require('firebase-functions');
 
+const admin = require('firebase-admin');
+admin.initializeApp(functions.config().firebase);
+
 /*
 * HTTP Cloud Function.
 *
@@ -19,9 +22,9 @@ exports.listEvents = functions.https.onRequest((req, res) => {
 
     for (var k in eventsData){
         if (eventsData.hasOwnProperty(k)) {
-            const evnt = eventsData[k];
-            if(evnt.type === "VEVENT" && moment(evnt.end).isAfter()) {
-                events.push(evnt);
+            const event = eventsData[k];
+            if(event.type === "VEVENT" && moment(event.end).isAfter()) {
+                events.push(event);
             }
         }
     }
@@ -32,4 +35,25 @@ exports.listEvents = functions.https.onRequest((req, res) => {
     res.setHeader('Content-Type', 'application/json'); //Requires application/json MIME type
     res.send(JSON.stringify({ "speech": response, "displayText": response}));
 
+});
+
+exports.downloadEvents = functions.pubsub.topic('download-events').onPublish((event) => {
+    return new Promise((resolve, reject) => {
+        ical.fromURL(EVENTS_URL, {}, (err, data) => {
+            if(err) {
+                console.error("Couldn't download ICS", err);
+                reject(err);
+            } else {
+                const events = {};
+                for (var k in data) {
+                    if (data.hasOwnProperty(k) && data[k].type === "VEVENT") {
+                        const event = data[k];
+                        k = k.replace('.', ',');
+                        events[k] = event;
+                    }
+                }
+                resolve(admin.database().ref('/').child('events').set(events));
+            }
+        });
+    });
 });
