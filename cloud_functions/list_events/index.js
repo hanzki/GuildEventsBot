@@ -10,7 +10,7 @@ const EVENTS_URL = 'http://tietokilta.fi/kalenteri/ical';
 * @param {Object} req Cloud Function request context.
 * @param {Object} res Cloud Function response context.
 */
-exports.helloHttp = function helloHttp (req, res) {
+exports.listEvents = function listEvents (req, res) {
 
     const eventsData = ical.parseFile('events.ics');
     const events = [];
