@@ -1,5 +1,5 @@
 const sinon = require('sinon');
-const index = require('..');
+const functions = require('../index');
 
 describe('listEvents', function() {
     describe('Simple request', function() {
@@ -13,7 +13,7 @@ describe('listEvents', function() {
             mock.expects('setHeader').withArgs('Content-Type', 'application/json');
             mock.expects('send').once();
 
-            index.listEvents({}, responseAPI);
+            functions.listEvents({}, responseAPI);
 
             mock.verify();
         });
