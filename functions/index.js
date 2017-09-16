@@ -37,23 +37,40 @@ exports.listEvents = functions.https.onRequest((req, res) => {
 
 });
 
-exports.downloadEvents = functions.pubsub.topic('download-events').onPublish((event) => {
+function refreshEventsCache() {
     return new Promise((resolve, reject) => {
         ical.fromURL(EVENTS_URL, {}, (err, data) => {
             if(err) {
                 console.error("Couldn't download ICS", err);
                 reject(err);
             } else {
-                const events = {};
+                const inserts = [];
                 for (var k in data) {
                     if (data.hasOwnProperty(k) && data[k].type === "VEVENT") {
                         const event = data[k];
                         k = k.replace('.', ',');
-                        events[k] = event;
+                        const firebaseEvent = {
+                            uid: event.uid || null,
+                            start: event.start && event.start.toJSON() || null,
+                            end: event.end && event.end.toJSON() || null,
+                            summary: event.summary || null,
+                            description: event.description || null,
+                            location: event.location || null,
+                        };
+                        inserts.push(admin.database().ref('/events/').child(k).set(firebaseEvent));
                     }
                 }
-                resolve(admin.database().ref('/').child('events').set(events));
+                resolve(Promise.all(inserts));
             }
         });
     });
+}
+
+exports.testDownloadEvents = functions.https.onRequest((req, res) => {
+    refreshEventsCache().then(() => res.send('done')).catch(() => res.sendStatus(500));
 });
+
+exports.downloadEvents = functions.pubsub.topic('download-events').onPublish((event) => {
+    return refreshEventsCache();
+});
+
