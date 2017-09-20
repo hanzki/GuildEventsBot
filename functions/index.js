@@ -70,7 +70,7 @@ exports.testDownloadEvents = functions.https.onRequest((req, res) => {
     refreshEventsCache().then(() => res.send('done')).catch(() => res.sendStatus(500));
 });
 
-exports.downloadEvents = functions.pubsub.topic('download-events').onPublish((event) => {
+exports.downloadEvents = functions.pubsub.topic('hourly-tick').onPublish((event) => {
     return refreshEventsCache();
 });
 
