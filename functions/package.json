@@ -2,22 +2,25 @@
   "name": "ListEventsFunction",
   "version": "1.0.0",
   "description": "Chat bot for querying info about guild events.",
-  "main": "index.js",
   "scripts": {
-    "test": "node_modules/mocha/bin/mocha"
+    "build": "tsc",
+    "test": "tsc && node_modules/mocha/bin/mocha lib/spec"
   },
+  "main": "./lib/src/index.js",
   "author": "hanzki",
   "license": "ISC",
   "dependencies": {
-    "chai": "^4.1.2",
     "firebase-admin": "^5.2.1",
     "firebase-functions": "^0.6.3",
     "ical": "^0.5.0",
-    "jsonfile": "^3.0.1",
-    "moment": "^2.18.1",
-    "sinon": "^3.2.1"
+    "moment": "^2.18.1"
   },
   "devDependencies": {
-    "mocha": "^3.5.3"
+    "@types/chai": "^4.0.4",
+    "@types/mocha": "^2.2.43",
+    "@types/sinon": "^2.3.5",
+    "chai": "^4.1.2",
+    "mocha": "^3.5.3",
+    "sinon": "^3.2.1"
   }
 }

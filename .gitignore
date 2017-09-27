@@ -1,3 +1,4 @@
 node_modules/
 .idea/
 appengine/lib/
+functions/lib/
