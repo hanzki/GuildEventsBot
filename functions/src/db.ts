@@ -19,7 +19,3 @@ export function push(path: string, value: any): Promise<any> {
 export function remove(path: string): Promise<void> {
     return admin.database().ref(path).remove();
 }
-
-export function transaction(path: string, callback): Promise<any> {
-    return admin.database().ref(path).transaction(callback);
-}

@@ -2,29 +2,9 @@ import * as moment from 'moment';
 import * as ical from 'ical';
 import * as db from './db';
 
-type Event = {
-    uid: string,
-    start: string,
-    end: string,
-    summary: string,
-    description?: string,
-    location?: string
-}
+import { Event } from './event';
 
 const EVENTS_URL = 'http://tietokilta.fi/kalenteri/ical';
-
-function eventsSortedByStartTime(events: Event[]): Event[] {
-    const comparator = function (a: Event, b: Event) {
-        const aStart = moment(a.start);
-        const bStart = moment(b.start);
-
-        if(aStart.isBefore(bStart)) { return -1; }
-        if(aStart.isAfter(bStart)) { return 1; }
-        else { return 0; }
-    };
-
-    return events.sort(comparator);
-}
 
 export async function upcomingEvents(): Promise<Event[]> {
     const eventsFromDB: any = await db.get('/events/');
@@ -40,7 +20,7 @@ export async function upcomingEvents(): Promise<Event[]> {
         }
     }
 
-    return eventsSortedByStartTime(events);
+    return events.sort(Event.compareByStartTime);
 }
 
 export function fetchNewEvents(): Promise<void> {

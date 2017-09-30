@@ -1,1 +1,5 @@
-{}
+{
+  "projects": {
+    "prod": "newagent-733de"
+  }
+}
