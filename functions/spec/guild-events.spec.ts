@@ -59,7 +59,7 @@ const testEvents: any = {
     }
 };
 
-describe('Guild Events Bot', () => {
+describe('Guild Events', () => {
     beforeEach(async () => {
         fakedb.reset();
         await fakedb.set('/events/', testEvents);
@@ -88,4 +88,16 @@ describe('Guild Events Bot', () => {
         });
 
     });
+
+    describe('eventsDuringPeriod(start, end)', () => {
+
+        it('should return events overlapping period', async () => {
+            const start = moment().add(4, 'days').startOf('day');
+            const end = moment().add(4, 'days').endOf('day');
+            const events: Event[] = await guildEvents.eventsDuringPeriod(start, end);
+            expect(Array.isArray(events)).equal(true);
+            expect(events.length).equal(1);
+            expect(events[0]).equal(testEvents['5']);
+        });
+    })
 });

@@ -4,8 +4,8 @@
   "description": "Chat bot for querying info about guild events.",
   "scripts": {
     "build": "tsc",
-    "test": "tsc && node_modules/mocha/bin/mocha lib/spec",
-    "deploy": "tsc && node_modules/mocha/bin/mocha lib/spec && firebase deploy --only functions --project prod"
+    "test": "tsc && node_modules/mocha/bin/mocha lib/spec/*.spec.js",
+    "deploy": "tsc && node_modules/mocha/bin/mocha lib/spec/*.spec.js && firebase deploy --only functions --project prod"
   },
   "main": "./lib/src/index.js",
   "author": "hanzki",
@@ -19,6 +19,7 @@
   "devDependencies": {
     "@types/chai": "^4.0.4",
     "@types/mocha": "^2.2.43",
+    "@types/moment": "^2.13.0",
     "@types/sinon": "^2.3.5",
     "chai": "^4.1.2",
     "mocha": "^3.5.3",

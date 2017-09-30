@@ -1,5 +1,7 @@
 import moment = require("moment");
 
+const EVENT_LINK_PREFIX = 'http://tietokilta.fi/tapahtumat/';
+
 export class Event {
 
     constructor(
@@ -18,5 +20,10 @@ export class Event {
         if(aStart.isBefore(bStart)) { return -1; }
         if(aStart.isAfter(bStart)) { return 1; }
         else { return 0; }
+    }
+
+    static eventLink(e: Event): string {
+        const eventNumber = e.uid.substring(0, e.uid.indexOf('@'));
+        return EVENT_LINK_PREFIX + eventNumber;
     }
 }

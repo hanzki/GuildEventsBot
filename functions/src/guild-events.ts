@@ -3,6 +3,8 @@ import * as ical from 'ical';
 import * as db from './db';
 
 import { Event } from './event';
+import { Moment } from "moment";
+import * as assert from "assert";
 
 const EVENTS_URL = 'http://tietokilta.fi/kalenteri/ical';
 
@@ -15,6 +17,25 @@ export async function upcomingEvents(): Promise<Event[]> {
         if (eventsFromDB.hasOwnProperty(k)) {
             const event = eventsFromDB[k];
             if(moment(event.end).isAfter()) {
+                events.push(event as Event);
+            }
+        }
+    }
+
+    return events.sort(Event.compareByStartTime);
+}
+
+export async function eventsDuringPeriod(start: Moment, end: Moment): Promise<Event[]> {
+    assert.ok(start.isSameOrBefore(end), 'start must be same or before end');
+
+    const eventsFromDB: any = await db.get('/events/');
+
+    const events: Event[] = [];
+
+    for (const k in eventsFromDB) {
+        if (eventsFromDB.hasOwnProperty(k)) {
+            const event = eventsFromDB[k];
+            if(moment(event.start).isBetween(start, end) || start.isBetween(event.start, event.end)) {
                 events.push(event as Event);
             }
         }

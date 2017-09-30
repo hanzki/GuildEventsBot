@@ -1,22 +1,38 @@
-import * as moment from 'moment';
 import * as functions from 'firebase-functions';
 
-import * as guildEvents from './guild-events';
+import * as intents from './intents';
+import * as guildEvents from './guild-events'
 
-/*
-* HTTP Cloud Function.
-*
-* @param {Object} req Cloud Function request context.
-* @param {Object} res Cloud Function response context.
-*/
 exports.listEvents = functions.https.onRequest(async (req, res) => {
-    const events = await guildEvents.upcomingEvents();
+    const intent = req && req.body && req.body.result && req.body.result.metadata && req.body.result.metadata.intentName;
+    const parameters = req && req.body && req.body.result && req.body.result.parameters || {};
 
-    const response = 'There are ' + events.length + ' upcoming events. ' +
-        'Next one is ' + events[0].summary + ' on ' + moment(events[0].start).format('dddd, MMMM Do YYYY, h:mm a');
+    let response: string;
+    switch (intent) {
+        case 'guild.list_events':
+            const params = {};
+            if(parameters.date) {
+                params['date'] = parameters.date;
+            }
+            if(parameters['date-period']) {
+                params['period'] = parameters['date-period'];
+            }
+            response = await intents.listEvents(params);
+            break;
+        default:
+            response = 'Sorry, I don\'t know what you are talking about';
+    }
 
     res.setHeader('Content-Type', 'application/json'); //Requires application/json MIME type
-    res.send(JSON.stringify({ "speech": response, "displayText": response}));
+    res.send(JSON.stringify({
+        speech: response,
+        displayText: response,
+        data: {
+            telegram: {
+                text: response,
+                parse_mode: 'Markdown'
+            }
+        }}));
 });
 
 exports.testDownloadEvents = functions.https.onRequest(async (req, res) => {

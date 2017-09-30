@@ -13,8 +13,8 @@
       "node_modules/@types"
     ]
   },
-  "files": [
-    "src/index.ts",
-    "spec/index.spec.ts"
+  "include": [
+    "src/**/*",
+    "spec/**/*"
   ]
 }
