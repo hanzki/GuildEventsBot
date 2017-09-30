@@ -20,7 +20,7 @@ function eventDescription(e: Event): string {
         `\\[${moment(e.start).format('HH:mm')} - ${moment(e.end).format('HH:mm')}] _${e.location || ' '}_`,
         `${description}`,
         `[More Info](${link})`
-    ].join(' \n');
+    ].join('\n');
 }
 
 async function listUpcoming(): Promise<string> {
@@ -28,7 +28,7 @@ async function listUpcoming(): Promise<string> {
 
     let response = 'Here are upcoming Tietokilta events:';
     for (let i = 0; i < events.length && i < 5; i++) {
-        response += ' \n' + eventDescription(events[i]);
+        response += '\n\n' + eventDescription(events[i]);
     }
 
     return response;
@@ -42,7 +42,7 @@ async function listEventsForDate(date: Moment): Promise<string> {
     if (events && events.length) {
         let response = `Here are Tietokilta events happening on ${date.format('dddd, DD.MM')}:` ;
         for (let i = 0; i < events.length && i < 5; i++) {
-            response += ' \n' + eventDescription(events[i]);
+            response += '\n\n' + eventDescription(events[i]);
         }
         return response;
     } else {
@@ -57,7 +57,7 @@ async function listEventsForPeriod(start: Moment, end: Moment): Promise<string> 
     if (events && events.length) {
         let response = `Here are Tietokilta events happening between ${start.format('dddd, DD.MM')} and ${end.format('dddd, DD.MM')}:` ;
         for (let i = 0; i < events.length && i < 5; i++) {
-            response += ' \n' + eventDescription(events[i]);
+            response += '\n\n' + eventDescription(events[i]);
         }
         return response;
     } else {
