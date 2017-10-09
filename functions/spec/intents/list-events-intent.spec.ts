@@ -39,7 +39,8 @@ const fakeGuildEvents = {
 
 mock('../../src/guild-events', fakeGuildEvents);
 
-import { ListEventsIntent } from '../../src/intents/list-events';
+import { ListEventsIntent } from '../../src/intents/list-events-intent';
+import { ListEventsResponse } from "../../src/responses/list-events-response";
 
 describe('ListEventsIntent', () => {
     const intent = new ListEventsIntent();
@@ -47,8 +48,8 @@ describe('ListEventsIntent', () => {
     describe('makeResponse()', () => {
         it('should form response', async () => {
             const response = await intent.makeResponse({});
-            expect(typeof(response)).equal('string');
-            expect(response.length).greaterThan(0);
+            expect(response instanceof ListEventsResponse).equal(true);
+            expect(response.toString().length).greaterThan(0);
         })
     })
 

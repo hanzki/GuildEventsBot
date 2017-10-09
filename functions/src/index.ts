@@ -1,23 +1,25 @@
 import * as functions from 'firebase-functions';
 
 import * as guildEvents from './guild-events'
-import {ListEventsIntent} from "./intents/list-events";
+import {ListEventsIntent} from "./intents/list-events-intent";
 import {Intent} from "./intents/intent";
-import {UnknownIntent} from "./intents/unknown";
+import {UnknownIntent} from "./intents/unknown-intent";
+import {Response} from "./responses/response";
 
 exports.listEvents = functions.https.onRequest(async (req, res) => {
     const intent = getIntent(req);
     const parameters = getIntentParameters(req);
 
-    const response = intent.makeResponse(parameters);
+    const response: Response = intent.makeResponse(parameters);
+    const responseString = response.toString();
 
     res.setHeader('Content-Type', 'application/json'); //Requires application/json MIME type
     res.send(JSON.stringify({
-        speech: response,
-        displayText: response,
+        speech: responseString,
+        displayText: responseString,
         data: {
             telegram: {
-                text: response,
+                text: responseString,
                 parse_mode: 'Markdown'
             }
         }}));
