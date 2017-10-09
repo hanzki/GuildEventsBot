@@ -9,7 +9,7 @@ import * as assert from "assert";
 const EVENTS_URL = 'http://tietokilta.fi/kalenteri/ical';
 
 export async function upcomingEvents(): Promise<Event[]> {
-    const eventsFromDB: any = await db.get('/events/');
+    const eventsFromDB: any = await db.getFutureAndOngoingEvents();
 
     const events: Event[] = [];
 
@@ -28,7 +28,8 @@ export async function upcomingEvents(): Promise<Event[]> {
 export async function eventsDuringPeriod(start: Moment, end: Moment): Promise<Event[]> {
     assert.ok(start.isSameOrBefore(end), 'start must be same or before end');
 
-    const eventsFromDB: any = await db.get('/events/');
+    // The end time is increased to make sure that all events that start during the period are fetched from the database.
+    const eventsFromDB: any = await db.getEventsEndingDuringAPeriod(start, moment(end).add(5, 'days'));
 
     const events: Event[] = [];
 
@@ -51,12 +52,12 @@ export function fetchNewEvents(): Promise<void> {
                 console.error("Couldn't download ICS", err);
                 reject(err);
             } else {
-                const inserts = [];
+                const firebaseEvents = {};
                 for (let k in eventsData) {
                     if (eventsData.hasOwnProperty(k) && eventsData[k].type === "VEVENT") {
                         const event = eventsData[k];
                         k = k.replace('.', ',');
-                        const firebaseEvent = {
+                        firebaseEvents[k] = {
                             uid: event.uid || null,
                             start: event.start && event.start.toJSON() || null,
                             end: event.end && event.end.toJSON() || null,
@@ -64,10 +65,9 @@ export function fetchNewEvents(): Promise<void> {
                             description: event.description || null,
                             location: event.location || null,
                         };
-                        inserts.push(db.set('/events/' + k, firebaseEvent));
                     }
                 }
-                resolve(Promise.all(inserts));
+                resolve(db.set('/events', firebaseEvents));
             }
         });
     }).then(() => {});

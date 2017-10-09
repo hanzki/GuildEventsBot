@@ -1,27 +1,15 @@
 import * as functions from 'firebase-functions';
 
-import * as intents from './intents';
 import * as guildEvents from './guild-events'
+import {ListEventsIntent} from "./intents/list-events";
+import {Intent} from "./intents/intent";
+import {UnknownIntent} from "./intents/unknown";
 
 exports.listEvents = functions.https.onRequest(async (req, res) => {
-    const intent = req && req.body && req.body.result && req.body.result.metadata && req.body.result.metadata.intentName;
-    const parameters = req && req.body && req.body.result && req.body.result.parameters || {};
+    const intent = getIntent(req);
+    const parameters = getIntentParameters(req);
 
-    let response: string;
-    switch (intent) {
-        case 'guild.list_events':
-            const params = {};
-            if(parameters.date) {
-                params['date'] = parameters.date;
-            }
-            if(parameters['date-period']) {
-                params['period'] = parameters['date-period'];
-            }
-            response = await intents.listEvents(params);
-            break;
-        default:
-            response = 'Sorry, I don\'t know what you are talking about';
-    }
+    const response = intent.makeResponse(parameters);
 
     res.setHeader('Content-Type', 'application/json'); //Requires application/json MIME type
     res.send(JSON.stringify({
@@ -34,6 +22,31 @@ exports.listEvents = functions.https.onRequest(async (req, res) => {
             }
         }}));
 });
+
+function getIntent(request): Intent {
+    try {
+        return intentForIntentName(request.body.result.metadata.intentName);
+    } catch (err) {
+        return new UnknownIntent();
+    }
+}
+
+function intentForIntentName(intentName: string): Intent {
+    switch (intentName) {
+        case 'guild.list_events':
+            return new ListEventsIntent();
+        default:
+            return new UnknownIntent();
+    }
+}
+
+function getIntentParameters(request) {
+    try {
+        return request.body.result.parameters;
+    } catch (err) {
+        return {};
+    }
+}
 
 exports.testDownloadEvents = functions.https.onRequest(async (req, res) => {
     await guildEvents.fetchNewEvents();

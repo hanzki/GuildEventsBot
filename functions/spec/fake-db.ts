@@ -1,4 +1,6 @@
 import * as mock from 'mock-require';
+import * as moment from 'moment';
+import {Moment} from "moment";
 
 let _values;
 let pushCount;
@@ -42,4 +44,30 @@ export function values() {
 
 export function init(otherModule: string) {
     mock(otherModule, './fake-db');
+}
+
+export function getFutureAndOngoingEvents() {
+    return this.get('/events/')
+        .then(events => {
+            const filteredEvents = {};
+            for (let k in events) {
+                if(events.hasOwnProperty(k) && moment().isBefore(events[k].end)) {
+                    filteredEvents[k] = events[k];
+                }
+            }
+            return filteredEvents;
+        });
+}
+
+export function getEventsEndingDuringAPeriod(start: Moment, end: Moment) {
+    return this.get('/events/')
+        .then(events => {
+            const filteredEvents = {};
+            for (let k in events) {
+                if(events.hasOwnProperty(k) && start.isBefore(events[k].end) && end.isAfter(events[k].end)) {
+                    filteredEvents[k] = events[k];
+                }
+            }
+            return filteredEvents;
+        });
 }

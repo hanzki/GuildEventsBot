@@ -37,15 +37,16 @@ const fakeGuildEvents = {
     ]
 };
 
-mock('../src/guild-events', fakeGuildEvents);
+mock('../../src/guild-events', fakeGuildEvents);
 
-import * as intets from '../src/intents';
+import { ListEventsIntent } from '../../src/intents/list-events';
 
-describe('Intents', () => {
+describe('ListEventsIntent', () => {
+    const intent = new ListEventsIntent();
 
-    describe('listEvents()', () => {
+    describe('makeResponse()', () => {
         it('should form response', async () => {
-            const response = await intets.listEvents({});
+            const response = await intent.makeResponse({});
             expect(typeof(response)).equal('string');
             expect(response.length).greaterThan(0);
         })
